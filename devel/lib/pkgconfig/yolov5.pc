@@ -1,0 +1,1 @@
+/home/user/projek-kamera/devel/.private/yolov5/lib/pkgconfig/yolov5.pc

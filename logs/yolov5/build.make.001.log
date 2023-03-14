@@ -1,0 +1,15 @@
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target _yolov5_generate_messages_check_deps_BoundingBoxes
+[  0%] Built target _yolov5_generate_messages_check_deps_kamera
+[  0%] Built target _yolov5_generate_messages_check_deps_vision
+[  0%] Built target _yolov5_generate_messages_check_deps_BoundingBox
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_py
+[ 18%] Built target yolov5_generate_messages_nodejs
+[ 18%] Built target std_msgs_generate_messages_lisp
+[ 40%] Built target yolov5_generate_messages_eus
+[ 59%] Built target yolov5_generate_messages_cpp
+[ 77%] Built target yolov5_generate_messages_lisp
+[100%] Built target yolov5_generate_messages_py
+[100%] Built target yolov5_generate_messages

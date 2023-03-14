@@ -1,0 +1,6 @@
+devel_space: /home/user/projek-kamera/devel
+install: false
+install_space: /home/user/projek-kamera/install
+profile: default
+source_space: /home/user/projek-kamera/src
+workspace: /home/user/projek-kamera

@@ -1,0 +1,1 @@
+/home/user/projek-kamera/devel/.private/yolov5/lib/python3/dist-packages/yolov5/msg/_BoundingBox.py
