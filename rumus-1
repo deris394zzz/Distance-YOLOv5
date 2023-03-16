@@ -1,0 +1,19 @@
+#!/usr/bin/env python3
+import rospy
+from std_msgs.msg import String
+from yolov5.msg import kamera
+
+def callback(bounding_box):
+    #f = (bounding_box.width * 60) / 7.5 = 712
+    j = (712 * 9) / bounding_box.width
+    rospy.loginfo("width %s", bounding_box.width)
+    #rospy.loginfo("focal %s", f)
+    rospy.loginfo("jarak %s", j)
+
+def listener():
+    rospy.init_node('subcriber', anonymous=True)
+    rospy.Subscriber('kamera_pub',kamera,callback)
+    rospy.spin()
+
+if __name__ == '__main__':
+    listener()

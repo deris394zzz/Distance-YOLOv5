@@ -1,4 +1,4 @@
-# YOLOv5 🚀 by Ultralytics, GPL-3.0 license
+#!/usr/bin/env python3
 """
 Run YOLOv5 detection inference on images, videos, directories, globs, YouTube, webcam, streams, etc.
 
@@ -31,8 +31,10 @@ import os
 import platform
 import sys
 from pathlib import Path
+import rospy
 
 import torch
+import torch.backends.cudnn as cudnn
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
@@ -44,9 +46,17 @@ from models.common import DetectMultiBackend
 from utils.dataloaders import IMG_FORMATS, VID_FORMATS, LoadImages, LoadScreenshots, LoadStreams
 from utils.general import (LOGGER, Profile, check_file, check_img_size, check_imshow, check_requirements, colorstr, cv2,
                            increment_path, non_max_suppression, print_args, scale_boxes, strip_optimizer, xyxy2xywh)
+
 from utils.plots import Annotator, colors, save_one_box
 from utils.torch_utils import select_device, smart_inference_mode
+from yolov5.msg import kamera
 
+DOT_RADIUS = 2
+DOT_COLOR = (0,255,0) #Red (BGR Values)
+DOT_THICKNESS = 4
+# Grid Variables
+GRID_COLOR = (255,255,255) #White (BGR Values)
+GRID_THICKNESS = 1 
 
 @smart_inference_mode()
 def run(
@@ -129,6 +139,9 @@ def run(
         with dt[2]:
             pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
 
+        #initialize publisher
+        pred_pub = rospy.Publisher('kamera_pub',kamera,queue_size=1)
+
         # Second-stage classifier (optional)
         # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
 
@@ -166,12 +179,37 @@ def run(
                             f.write(('%g ' * len(line)).rstrip() % line + '\n')
 
                     if save_img or save_crop or view_img:  # Add bbox to image
+                        bounding_box = kamera()
                         c = int(cls)  # integer class
+                        rate = rospy.Rate(200)
+                    
+                        bounding_box.object_label = names[c]
+                        bounding_box.probability = float("{:.2f}".format(conf)) #limitting 2 number after comma
+                        bounding_box.xmin_cv = int(xyxy[0])
+                        bounding_box.ymin_cv = int(xyxy[1])
+                        bounding_box.xmax_cv = int(xyxy[2])
+                        bounding_box.ymax_cv= int(xyxy[3])
+                        bounding_box.width = bounding_box.xmax_cv - bounding_box.xmin_cv
+                        bounding_box.height = bounding_box.ymax_cv - bounding_box.ymin_cv
+                        bounding_box.xcenter_cv = ((bounding_box.xmin_cv + bounding_box.xmax_cv) /2)
+                        bounding_box.ycenter_cv = ((bounding_box.ymin_cv + bounding_box.ymax_cv) /2)
+                        DOT_CENTER = (int(bounding_box.xcenter_cv),int(bounding_box.ycenter_cv))
+                    
+                        #bounding_boxes.bounding_boxes.append(bounding_box)
+
+                        pred_pub.publish(bounding_box)
+                        rate.sleep()
+
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
-                    if save_crop:
-                        save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
+                    else: # didnt detect object
+                        rate = rospy.Rate(200)
 
+                        bounding_box = kamera()
+                        bounding_box.object_label = "Null"
+                        pred_pub.publish(bounding_box)                      
+                        rate.sleep()
+                   
             # Stream results
             im0 = annotator.result()
             if view_img:
@@ -255,5 +293,6 @@ def main(opt):
 
 
 if __name__ == "__main__":
+    rospy.init_node("yolov5_node")
     opt = parse_opt()
     main(opt)
