@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-
-#code ini untuk pid control
-
 import rospy
 from simple_pid import PID
 
@@ -16,15 +13,27 @@ def callback(bounding_box):
     rospy.loginfo("jarak dari tengah %s", j)
     
     pid = PID (1, 0.1, 0.05, setpoint=320)
+    pid.output_limits = (-1, 1)
     v = bounding_box.xcenter_cv
     control = pid(v)
     v = bounding_box.xcenter_cv
     rospy.loginfo("Control = %s", control)
+    #publisher node
+    pub = rospy.Publisher('jarak', String, queue_size=10)
+    rate = rospy.Rate(10) # 10hz   
+    while not rospy.is_shutdown():
+        pub.publish(control)
+        rate.sleep()
 
 def listener():
     rospy.init_node('subcriber', anonymous=True)
     rospy.Subscriber('kamera_pub',kamera,callback)
     rospy.spin()
     
+
+
+
+
 if __name__ == '__main__':
     listener()
+
