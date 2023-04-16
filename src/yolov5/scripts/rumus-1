@@ -12,6 +12,13 @@ def callback(bounding_box):
     j = (712 * 9) / bounding_box.width
     rospy.loginfo("width %s", bounding_box.width)
     rospy.loginfo("jarak %s", j)
+    #piblisher node
+    pub = rospy.Publisher('jarak', String, queue_size=10)
+    rate = rospy.Rate(10) # 10hz   
+    while not rospy.is_shutdown():
+        pub.publish(j)
+        rate.sleep()
+
 
 def listener():
     rospy.init_node('subcriber', anonymous=True)
