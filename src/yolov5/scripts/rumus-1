@@ -4,10 +4,13 @@ from std_msgs.msg import String
 from yolov5.msg import kamera
 
 def callback(bounding_box):
-    #f = (bounding_box.width * 60) / 7.5 = 712
+    #rumus untuk mencari focal leght
+    #f = (bounding_box.width * 60) / 7.5
+    #rospy.loginfo("focal %s", f)    
+    #focal leght yang saya dapat sebesar 712
+    
     j = (712 * 9) / bounding_box.width
     rospy.loginfo("width %s", bounding_box.width)
-    #rospy.loginfo("focal %s", f)
     rospy.loginfo("jarak %s", j)
 
 def listener():
