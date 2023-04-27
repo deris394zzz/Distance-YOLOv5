@@ -13,17 +13,20 @@ def callback(bounding_box):
     rospy.loginfo("jarak dari tengah %s", j)
     
     pid = PID (1, 0.1, 0.05, setpoint=320)
-    pid.output_limits = (-1, 1)
     v = bounding_box.xcenter_cv
     control = pid(v)
     v = bounding_box.xcenter_cv
     rospy.loginfo("Control = %s", control)
+
+    joystik = (((control - (-320)) * (2000 - 1000)) / (320 - (-320))) + 1000
+
+    rospy.loginfo("Joystik = %s", joystik)
+
     #publisher node
-    pub = rospy.Publisher('jarak', String, queue_size=10)
+    pub = rospy.Publisher('control_joystick', String, queue_size=10)
     rate = rospy.Rate(10) # 10hz   
-    while not rospy.is_shutdown():
-        pub.publish(control)
-        rate.sleep()
+    pub.publish(joystik)
+    rate.sleep()
 
 def listener():
     rospy.init_node('subcriber', anonymous=True)
@@ -36,4 +39,3 @@ def listener():
 
 if __name__ == '__main__':
     listener()
-
